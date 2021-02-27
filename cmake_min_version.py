@@ -1,16 +1,16 @@
 import argparse
 import glob
-import platform
 import math
 import os.path
+import platform
 import re
 import subprocess
+import sys
 import tempfile
-from typing import List, Optional, NamedTuple
+from typing import List, NamedTuple, Optional
 
 from packaging.version import parse as version_parse
 from termcolor import colored
-import sys
 
 sys.stdout.reconfigure(encoding="utf-8")
 
