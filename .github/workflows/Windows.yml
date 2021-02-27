@@ -33,4 +33,4 @@ jobs:
             python -m venv venv
             .\venv\Scripts\pip.exe install -r .\requirements.txt
             .\venv\Scripts\python.exe cmake_downloader.py --latest_patch
-            .\venv\Scripts\python.exe cmake_min_version.py --full_search FULL_SEARCH $GITHUB_WORKSPACE/tests/${{ matrix.version_test }}/
+            .\venv\Scripts\python.exe cmake_min_version.py --full_search FULL_SEARCH ${{ GITHUB_WORKSPACE }}/tests/${{ matrix.version_test }}/
