@@ -7,7 +7,9 @@ import re
 import subprocess
 import sys
 import tempfile
-from typing import List, NamedTuple, Optional
+from typing import List
+from typing import NamedTuple
+from typing import Optional
 
 from packaging.version import parse as version_parse
 from termcolor import colored
