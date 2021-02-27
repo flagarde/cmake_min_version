@@ -31,8 +31,7 @@ class ConfigureResult:
         # try to read proposed minimal version from stderr output
         try:
             self.proposed_version = re.findall(
-                r"CMake ([^ ]+) or higher is required.", stderr
-            )[0]
+                r"CMake ([^ ]+) or higher is required.", stderr)[0]
 
             # support ranges
             if ".." in self.proposed_version:
@@ -67,11 +66,8 @@ def get_cmake_binaries(tools_dir: str) -> List[CMakeBinary]:
         except IndexError:
             pass
 
-    print(
-        "Found {count} CMake binaries from directory {tools_dir}\n".format(
-            count=len(binaries), tools_dir=tools_dir
-        )
-    )
+    print("Found {count} CMake binaries from directory {tools_dir}\n".format(
+        count=len(binaries), tools_dir=tools_dir))
     return sorted(binaries, key=lambda x: version_parse(x.version))
 
 
@@ -85,16 +81,15 @@ def try_configure(binary: str, cmake_parameters: List[str]) -> ConfigureResult:
     )
     proc.wait()
 
-    return ConfigureResult(
-        return_code=proc.returncode, stderr=proc.stderr.read().decode("utf-8")
-    )
+    return ConfigureResult(return_code=proc.returncode,
+                           stderr=proc.stderr.read().decode("utf-8"))
 
 
-def binary_search(cmake_parameters: List[str], tools_dir: str) -> Optional[CMakeBinary]:
+def binary_search(cmake_parameters: List[str],
+                  tools_dir: str) -> Optional[CMakeBinary]:
     versions = get_cmake_binaries(tools_dir)  # type: List[CMakeBinary]
-    longest_version_string = (
-        max([len(cmake.version) for cmake in versions]) + 1
-    )  # type: int
+    longest_version_string = (max([len(cmake.version)
+                                   for cmake in versions]) + 1)  # type: int
 
     lower_idx = 0  # type: int
     upper_idx = len(versions) - 1  # type: int
@@ -108,10 +103,12 @@ def binary_search(cmake_parameters: List[str], tools_dir: str) -> Optional[CMake
 
         steps += 1
         remaining_versions = upper_idx - lower_idx + 1  # type: int
-        remaining_steps = int(math.ceil(math.log2(remaining_versions)))  # type: int
+        remaining_steps = int(math.ceil(
+            math.log2(remaining_versions)))  # type: int
 
         print(
-            "[{progress:3.0f}%] CMake {cmake_version:{longest_version_string}}".format(
+            "[{progress:3.0f}%] CMake {cmake_version:{longest_version_string}}"
+            .format(
                 progress=100.0 * float(steps - 1) / (steps + remaining_steps),
                 cmake_version=cmake_binary.version,
                 longest_version_string=longest_version_string,
@@ -134,20 +131,17 @@ def binary_search(cmake_parameters: List[str], tools_dir: str) -> Optional[CMake
             proposed_binary = [
                 x for x in versions if x.version == result.proposed_version
             ]
-            lower_idx = (
-                versions.index(proposed_binary[0])
-                if len(proposed_binary)
-                else mid_idx + 1
-            )
+            lower_idx = (versions.index(proposed_binary[0])
+                         if len(proposed_binary) else mid_idx + 1)
 
     return versions[last_success_idx] if last_success_idx is not None else None
 
 
-def full_search(cmake_parameters: List[str], tools_dir: str) -> Optional[CMakeBinary]:
+def full_search(cmake_parameters: List[str],
+                tools_dir: str) -> Optional[CMakeBinary]:
     versions = get_cmake_binaries(tools_dir)  # type: List[CMakeBinary]
-    longest_version_string = (
-        max([len(cmake.version) for cmake in versions]) + 1
-    )  # type: int
+    longest_version_string = (max([len(cmake.version)
+                                   for cmake in versions]) + 1)  # type: int
 
     lower_idx = 0  # type: int
     upper_idx = len(versions) - 1  # type: int
@@ -158,10 +152,12 @@ def full_search(cmake_parameters: List[str], tools_dir: str) -> Optional[CMakeBi
     for cmake_binary in versions:
         steps += 1
         remaining_versions = upper_idx - lower_idx + 1  # type: int
-        remaining_steps = int(math.ceil(math.log2(remaining_versions)))  # type: int
+        remaining_steps = int(math.ceil(
+            math.log2(remaining_versions)))  # type: int
 
         print(
-            "[{progress:3.0f}%] CMake {cmake_version:{longest_version_string}}".format(
+            "[{progress:3.0f}%] CMake {cmake_version:{longest_version_string}}"
+            .format(
                 progress=100.0 * float(steps - 1) / (steps + remaining_steps),
                 cmake_version=cmake_binary.version,
                 longest_version_string=longest_version_string,
@@ -187,11 +183,11 @@ def full_search(cmake_parameters: List[str], tools_dir: str) -> Optional[CMakeBi
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="Find the minimal required CMake version for a project."
-    )
-    parser.add_argument(
-        "params", type=str, nargs="+", help="parameters to pass to CMake"
-    )
+        description="Find the minimal required CMake version for a project.")
+    parser.add_argument("params",
+                        type=str,
+                        nargs="+",
+                        help="parameters to pass to CMake")
     parser.add_argument(
         "--tools_directory",
         metavar="DIR",
@@ -201,7 +197,8 @@ if __name__ == "__main__":
     parser.add_argument(
         "--full_search",
         default=False,
-        help="Searches using a top down approach instead of a binary search (default: False)",
+        help=
+        "Searches using a top down approach instead of a binary search (default: False)",
     )
     args = parser.parse_args()
 
@@ -211,22 +208,14 @@ if __name__ == "__main__":
         working_version = binary_search(args.params, args.tools_directory)
 
     if working_version:
-        print(
-            "[100%] Minimal working version: {cmake} {version}".format(
-                cmake=colored("CMake", "blue"),
-                version=colored(working_version.version, "blue"),
-            )
-        )
+        print("[100%] Minimal working version: {cmake} {version}".format(
+            cmake=colored("CMake", "blue"),
+            version=colored(working_version.version, "blue"),
+        ))
 
-        print(
-            "\ncmake_minimum_required(VERSION {version})".format(
-                version=working_version.version
-            )
-        )
+        print("\ncmake_minimum_required(VERSION {version})".format(
+            version=working_version.version))
 
     else:
-        print(
-            "[100%] {message}".format(
-                message=colored("ERROR: Could not find working version.", "red")
-            )
-        )
+        print("[100%] {message}".format(
+            message=colored("ERROR: Could not find working version.", "red")))
